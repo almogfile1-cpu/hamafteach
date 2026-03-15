@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>המפתח שלי — גלה את המיומנויות שלך</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      /* Dark space palette */
+      --gold:     #c9a84c;
+      --gold-l:   #e8c87a;
+      --gold-d:   #9a7230;
+      --gold-dim: rgba(201,168,76,.18);
+      --gold-glow:rgba(201,168,76,.35);
+
+      --bg:       #0a0a1a;
+      --bg2:      #0d0d26;
+      --surface:  rgba(255,255,255,.05);
+      --surface2: rgba(255,255,255,.09);
+
+      --white:  #ffffff;
+      --text:   #f0f0f0;
+      --muted:  rgba(240,240,240,.55);
+      --border: rgba(201,168,76,.18);
+      --border2:rgba(201,168,76,.38);
+
+      --grad:   linear-gradient(135deg, #c9a84c 0%, #e8c87a 50%, #c9a84c 100%);
+      --grad-r: linear-gradient(315deg, #c9a84c 0%, #e8c87a 50%, #c9a84c 100%);
+      --grad-dim: linear-gradient(135deg, rgba(201,168,76,.12) 0%, rgba(232,200,122,.06) 100%);
+
+      --sh:    0 8px 32px rgba(0,0,0,.55), 0 0 0 1px rgba(201,168,76,.1);
+      --sh-sm: 0 4px 16px rgba(0,0,0,.4),  0 0 0 1px rgba(201,168,76,.08);
+      --glow:  0 0 20px rgba(201,168,76,.3), 0 0 60px rgba(201,168,76,.1);
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+
+    body {
+      font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+      overflow-x: hidden;
+    }
+
+    /* ── STAR CANVAS ── */
+    #stars-canvas {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: rgba(10,10,26,.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+
+    .logo-icon {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-d), var(--gold), var(--gold-l));
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 14px rgba(201,168,76,.45), 0 3px 10px rgba(0,0,0,.4);
+    }
+
+    .logo-labels span { display:block; }
+    .logo-labels .l-main { font-weight:800; font-size:1rem; color:var(--text); line-height:1.1; }
+    .logo-labels .l-sub  { font-weight:400; font-size:.68rem; color:var(--muted); }
+
+    .hdr-link {
+      font-size:.8rem; font-weight:700;
+      text-decoration:none;
+      color: var(--gold);
+      border: 1.5px solid var(--border2);
+      padding:.35rem .9rem;
+      border-radius:100px;
+      transition: all .22s;
+      letter-spacing:.3px;
+    }
+    .hdr-link:hover {
+      background: rgba(201,168,76,.12);
+      border-color: var(--gold);
+      box-shadow: var(--glow);
+      color: var(--gold-l);
+    }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width:660px; margin:0 auto; padding:2.2rem 1rem 5rem; position:relative; z-index:1; }
+
+    /* ── SCREENS ── */
+    .screen { display:none; }
+    .screen.active {
+      display:block;
+      animation: pgIn .48s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes pgIn {
+      from { opacity:0; transform:translateY(28px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── CARD (glassmorphism) ── */
+    .card {
+      background: rgba(15,15,38,.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(201,168,76,.35);
+      box-shadow: var(--sh), inset 0 1px 0 rgba(255,255,255,.06), 0 0 40px rgba(201,168,76,.12);
+    }
+
+    /* ── WELCOME HERO ── */
+    .hero {
+      background: linear-gradient(135deg, rgba(15,10,35,.98) 0%, rgba(20,15,45,.95) 60%, rgba(10,12,30,.98) 100%);
+      padding: 2.8rem 2.5rem 3.2rem;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero::before {
+      content:'';
+      position:absolute; inset:0;
+      background-image:
+        radial-gradient(ellipse at 20% 60%, rgba(201,168,76,.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 15%, rgba(201,168,76,.07) 0%, transparent 45%);
+      pointer-events:none;
+    }
+    .hero::after {
+      content:'';
+      position:absolute; inset:0;
+      background-image: radial-gradient(rgba(201,168,76,.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events:none;
+      opacity:.6;
+    }
+    .hero-body {
+      display: flex;
+      align-items: flex-end;
+      gap: 0;
+      position: relative;
+    }
+    .hero-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .hero-char {
+      height: 280px;
+      width: auto;
+      object-fit: contain;
+      flex-shrink: 0;
+      align-self: flex-end;
+      filter: drop-shadow(0 0 20px rgba(100,200,255,0.4));
+      pointer-events: none;
+      position: relative;
+      margin-left: -1rem; /* bleed slightly into card edge */
+    }
+
+    .hero-deco {
+      position:absolute;
+      left: 1.5rem; bottom: -8px;
+      width:130px; height:130px;
+      opacity:.06;
+      pointer-events:none;
+    }
+
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(201,168,76,.1);
+      color: var(--gold-l);
+      border:1px solid var(--border2);
+      padding:.28rem .85rem;
+      border-radius:100px;
+      font-size:.74rem; font-weight:600;
+      margin-bottom:1.2rem;
+      position:relative;
+      letter-spacing:.4px;
+    }
+
+    .hero-logo {
+      display: block;
+      margin: 0 auto 1.6rem;
+      max-width: 320px;
+      width: 100%;
+      position: relative;
+      filter: drop-shadow(0 4px 18px rgba(0,0,0,.55)) drop-shadow(0 0 12px rgba(201,168,76,.18));
+    }
+
+    .hero-title {
+      font-size: clamp(1.9rem, 5vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: .8rem;
+      position: relative;
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
+      text-shadow: 0 0 30px rgba(201,168,76,.8), 0 0 60px rgba(201,168,76,.4);
+    }
+
+    .hero-desc {
+      color: #e8e0cc;
+      font-size:.95rem; line-height:1.8;
+      max-width:440px;
+      position:relative;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps-wrap {
+      padding: 2rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps-grid {
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:1rem;
+    }
+
+    .step { text-align:center; }
+
+    .step-num {
+      width:34px; height:34px;
+      border-radius:50%;
+      background: linear-gradient(135deg, var(--gold-d), var(--gold));
+      color: #0a0a1a;
+      font-weight:900; font-size:.82rem;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto .7rem;
+      box-shadow: 0 0 12px rgba(201,168,76,.4), 0 3px 10px rgba(0,0,0,.3);
+    }
+
+    .step-title { font-weight:700; font-size:.82rem; color:var(--text); margin-bottom:.22rem; }
+    .step-desc  { font-size:.73rem; color:#e8e0cc; line-height:1.55; }
+
+    /* ── CTA BAR ── */
+    .cta-bar {
+      padding:1.4rem 2.5rem 1.8rem;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:1rem; flex-wrap:wrap;
+    }
+    .privacy-note {
+      width: 100%;
+      text-align: center;
+      font-size: 13px;
+      color: #8a9ab5;
+      margin: .2rem 0 0;
+      line-height: 1.5;
+    }
+
+    .chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .chip {
+      font-size:.72rem; font-weight:500;
+      color: var(--muted);
+      background: rgba(201,168,76,.06);
+      border:1px solid var(--border);
+      padding:.22rem .65rem;
+      border-radius:100px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family:'Heebo', Arial, sans-serif;
+      font-weight:700;
+      cursor:pointer;
+      border:none;
+      border-radius:100px;
+      transition:all .22s;
+      white-space:nowrap;
+      letter-spacing:.3px;
+    }
+
+    .btn-grad {
+      background: linear-gradient(135deg, var(--gold-d) 0%, var(--gold) 50%, var(--gold-l) 100%);
+      color: #0a0a1a;
+      padding:.78rem 2.2rem;
+      font-size:.95rem;
+      font-weight:800;
+      box-shadow: 0 0 18px rgba(201,168,76,.4), 0 4px 16px rgba(0,0,0,.3);
+    }
+    .btn-grad:hover {
+      transform:translateY(-2px);
+      box-shadow: 0 0 30px rgba(201,168,76,.6), 0 8px 24px rgba(0,0,0,.4);
+    }
+    .btn-grad:active { transform:translateY(0); }
+
+    .btn-ghost {
+      background: rgba(201,168,76,.06);
+      color: var(--muted);
+      border:1.5px solid var(--border);
+      padding:.6rem 1.3rem;
+      font-size:.85rem;
+    }
+    .btn-ghost:hover {
+      border-color: var(--gold);
+      color: var(--gold-l);
+      background: rgba(201,168,76,.1);
+      box-shadow: 0 0 12px rgba(201,168,76,.2);
+    }
+
+    /* ── PROGRESS ── */
+    .prog-wrap { margin-bottom:1.1rem; }
+    .prog-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .prog-label { font-size:.78rem; color:var(--muted); font-weight:500; }
+    .prog-frac  { font-size:.78rem; font-weight:800; color:var(--gold); }
+
+    .prog-track {
+      height:4px;
+      background:rgba(201,168,76,.1);
+      border-radius:2px; overflow:hidden;
+    }
+    .prog-fill  {
+      height:100%;
+      background: linear-gradient(90deg, var(--gold-d), var(--gold), var(--gold-l));
+      border-radius:2px;
+      transition: width .5s cubic-bezier(.22,1,.36,1);
+      box-shadow: 0 0 10px rgba(201,168,76,.6);
+    }
+
+    /* ── QUESTION CARD ── */
+    .q-card { padding:2.5rem; }
+
+    .q-eyebrow {
+      font-size:.7rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:1.8px;
+      margin-bottom:.8rem;
+      color: var(--gold);
+      opacity:.8;
+    }
+
+    .q-text {
+      font-size: clamp(1.15rem,3vw,1.5rem);
+      font-weight:800; color:var(--text);
+      line-height:1.45; margin-bottom:1.8rem;
+    }
+
+    /* ── RATING SCALE ── */
+    .rating-opts {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: .5rem;
+      flex-wrap: wrap;
+    }
+
+    .rating-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      width: 72px; min-height: 72px;
+      padding: .7rem .4rem;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      cursor: pointer;
+      font-family: 'Heebo', Arial, sans-serif;
+      color: var(--text);
+      transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
+      opacity: 0;
+      animation: optIn .35s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .rating-btn:nth-child(1){animation-delay:.05s}
+    .rating-btn:nth-child(2){animation-delay:.11s}
+    .rating-btn:nth-child(3){animation-delay:.17s}
+    .rating-btn:nth-child(4){animation-delay:.23s}
+    .rating-btn:nth-child(5){animation-delay:.29s}
+    @keyframes optIn {
+      from{opacity:0;transform:translateY(10px)}
+      to  {opacity:1;transform:translateY(0)}
+    }
+
+    .rating-num {
+      font-size: 1.5rem; font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .rating-label {
+      font-size: .58rem; font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .rating-btn:hover:not(:disabled) {
+      border-color: var(--gold);
+      background: rgba(201,168,76,.08);
+      box-shadow: 0 0 18px rgba(201,168,76,.22);
+      transform: translateY(-3px);
+    }
+    .rating-btn:hover:not(:disabled) .rating-num { color: var(--gold-l); }
+
+    .rating-btn.selected {
+      background: linear-gradient(135deg, rgba(154,114,48,.25), rgba(201,168,76,.18));
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(201,168,76,.4), inset 0 0 20px rgba(201,168,76,.08);
+      transform: translateY(-3px);
+    }
+    .rating-btn.selected .rating-num { color: #fff; text-shadow: 0 0 10px rgba(201,168,76,.8); }
+    .rating-btn.selected .rating-label { color: var(--gold-l); }
+    .rating-btn:disabled { cursor: default; }
+
+    /* ── CALCULATING ── */
+    .calc-card { padding:5rem 2rem; text-align:center; }
+
+    .spin-wrap { width:80px; height:80px; position:relative; margin:0 auto 2rem; }
+
+    .ring {
+      position:absolute; border-radius:50%;
+      border:3px solid transparent;
+      animation: spinR 1.1s linear infinite;
+    }
+    .ring-a { inset:0; border-top-color:var(--gold); border-right-color:var(--gold-d); }
+    .ring-b {
+      inset:11px; border:2.5px solid transparent;
+      border-bottom-color:var(--gold-l); border-left-color:var(--gold-l);
+      animation-direction:reverse; animation-duration:.8s;
+      opacity:.6;
+    }
+    .ring-c {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .ring-logo {
+      width:34px; height:34px; border-radius:50%;
+      background: linear-gradient(135deg, var(--gold-d), var(--gold));
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 0 16px rgba(201,168,76,.5);
+    }
+    @keyframes spinR { to { transform:rotate(360deg); } }
+
+    .calc-title { font-size:1.4rem; font-weight:800; color:var(--text); margin-bottom:.5rem; }
+    .calc-sub { font-size:.88rem; color:var(--muted); line-height:1.65; }
+
+    .dots span { opacity:0; animation:blink 1.5s ease-in-out infinite; color:var(--gold); }
+    .dots span:nth-child(2){animation-delay:.22s}
+    .dots span:nth-child(3){animation-delay:.44s}
+    @keyframes blink { 0%,60%,100%{opacity:0} 30%{opacity:1} }
+
+    /* ── RESULTS ── */
+    .res-hero {
+      background: linear-gradient(135deg, rgba(15,10,35,.98) 0%, rgba(22,16,48,.95) 60%, rgba(10,12,30,.98) 100%);
+      padding:2rem 2.5rem 2.2rem;
+      position:relative;
+      overflow:hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .res-hero::before {
+      content:'';
+      position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse at 85% 50%, rgba(201,168,76,.1) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 80%, rgba(201,168,76,.06) 0%, transparent 45%);
+      pointer-events:none;
+    }
+    .res-hero::after {
+      content:'';
+      position:absolute; inset:0;
+      background-image: radial-gradient(rgba(201,168,76,.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events:none;
+    }
+
+    .res-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(201,168,76,.12);
+      color: var(--gold-l); border:1px solid var(--border2);
+      padding:.28rem .85rem; border-radius:100px;
+      font-size:.74rem; font-weight:600;
+      margin-bottom:.8rem; position:relative;
+      letter-spacing:.3px;
+    }
+
+    .res-title {
+      font-size:1.7rem; font-weight:900; margin-bottom:.4rem;
+      background: linear-gradient(135deg, #ffffff 0%, var(--gold-l) 60%, var(--gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; position:relative;
+    }
+    .res-summary { color:rgba(240,240,240,.7); font-size:.88rem; line-height:1.65; position:relative; }
+
+    .res-body {
+      padding:1.6rem 2.5rem 2rem;
+      display:flex; flex-direction:column; gap:14px;
+    }
+
+    .skill-card {
+      border-radius:14px;
+      border:1px solid var(--border);
+      padding:1.3rem 1.5rem;
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity:0;
+      overflow: hidden;
+      animation: rUp .5s cubic-bezier(.22,1,.36,1) forwards;
+      transition: box-shadow .25s, border-color .25s, background .25s, transform .2s;
+    }
+    .skill-img-wrap {
+      margin: -1.3rem -1.5rem 1.2rem;
+      position: relative;
+    }
+    .skill-img {
+      width: 100%; height: 240px;
+      object-fit: contain;
+      object-position: center bottom;
+      background: #0d0d1f;
+      display: block;
+      border-radius: 14px 14px 0 0;
+      box-shadow: 0 0 0 1px var(--border), 0 4px 24px rgba(201,168,76,.18);
+      filter: brightness(.92) saturate(1.05);
+      transition: filter .3s, box-shadow .3s;
+    }
+    .skill-card:hover .skill-img {
+      filter: brightness(1) saturate(1.12);
+      box-shadow: 0 0 0 1px var(--gold-glow), 0 4px 32px rgba(201,168,76,.35);
+    }
+    .skill-card:nth-child(1){animation-delay:.1s}
+    .skill-card:nth-child(2){animation-delay:.22s}
+    .skill-card:nth-child(3){animation-delay:.34s}
+    @keyframes rUp {
+      from{opacity:0;transform:translateY(18px)}
+      to  {opacity:1;transform:translateY(0)}
+    }
+    .skill-card:hover {
+      border-color: var(--gold-glow);
+      background: rgba(201,168,76,.06);
+      box-shadow: 0 0 24px rgba(201,168,76,.15), var(--sh-sm);
+      transform: translateY(-2px);
+    }
+
+    /* Growth card — teal accent */
+    .skill-card-growth {
+      border-color: rgba(20,184,166,.28);
+    }
+    .skill-card-growth:hover {
+      border-color: rgba(20,184,166,.55);
+      background: rgba(20,184,166,.05);
+      box-shadow: 0 0 24px rgba(20,184,166,.14), var(--sh-sm);
+    }
+    .skill-card-growth .skill-img {
+      box-shadow: 0 0 0 1px rgba(20,184,166,.2), 0 4px 24px rgba(20,184,166,.12);
+    }
+    .skill-card-growth:hover .skill-img {
+      box-shadow: 0 0 0 1px rgba(20,184,166,.4), 0 4px 32px rgba(20,184,166,.22);
+    }
+    .skill-card-growth .lp-num {
+      background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+      box-shadow: 0 0 8px rgba(20,184,166,.35);
+    }
+    .skill-card-growth .lp-tag {
+      color: #2dd4bf;
+      background: rgba(20,184,166,.08);
+      border-color: rgba(20,184,166,.22);
+    }
+    .skill-card-growth .lp-link { color: #2dd4bf; }
+    .skill-card-growth .lp-link:hover { color: #5eead4; }
+    .skill-card-growth .lp-header {
+      background: linear-gradient(135deg, #0f766e 0%, #14b8a6 50%, #2dd4bf 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Results section headers */
+    .results-cards { display: flex; flex-direction: column; gap: 1.2rem; padding: 0 1.5rem 1.5rem; }
+    .results-section-header {
+      display: flex; align-items: center; gap: .85rem;
+      padding: 1.2rem 1.5rem .6rem;
+    }
+    .rs-icon { font-size: 1.6rem; line-height: 1; }
+    .rs-title { font-size: 1.05rem; font-weight: 800; color: var(--text); }
+    .rs-sub   { font-size: .78rem; color: var(--muted); margin-top: .15rem; }
+    .results-strengths-header .rs-title { color: var(--gold-l); }
+    .results-growth-header    .rs-title { color: #2dd4bf; }
+
+    .skill-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:.6rem; }
+
+    .skill-name-wrap { display:flex; flex-direction:column; gap:.28rem; }
+
+    .wef-rank-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .67rem; font-weight: 700;
+      padding: .18rem .6rem;
+      border-radius: 100px;
+      white-space: nowrap;
+      width: fit-content;
+    }
+    .wef-rank-badge.wef-top {
+      color: var(--gold-l);
+      background: rgba(201,168,76,.12);
+      border: 1px solid rgba(201,168,76,.35);
+    }
+    .wef-rank-badge.wef-mid {
+      color: rgba(201,168,76,.75);
+      background: rgba(201,168,76,.07);
+      border: 1px solid rgba(201,168,76,.2);
+    }
+
+    .rank {
+      width:26px; height:26px; border-radius:50%;
+      background: linear-gradient(135deg, var(--gold-d), var(--gold));
+      color: #0a0a1a; font-size:.7rem; font-weight:900;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+      box-shadow: 0 0 10px rgba(201,168,76,.4);
+    }
+    .rank-2 { background:linear-gradient(135deg, #8a6020, #c9a84c); box-shadow: 0 0 10px rgba(201,168,76,.3); }
+    .rank-3 { background:linear-gradient(135deg, #5a4015, #9a7230); box-shadow: 0 0 8px rgba(201,168,76,.2); }
+
+    .skill-name   { font-size:1.05rem; font-weight:800; color:var(--text); }
+    .skill-reason { font-size:.84rem; color:var(--muted); line-height:1.75; margin-bottom:.95rem; }
+
+    .skill-link {
+      display:inline-flex; align-items:center; gap:5px;
+      font-family:'Heebo', Arial, sans-serif;
+      font-size:.8rem; font-weight:700;
+      color: var(--gold);
+      text-decoration:none;
+      border:1.5px solid var(--border2);
+      padding:.38rem .95rem; border-radius:100px;
+      transition:all .2s;
+      background: rgba(201,168,76,.06);
+    }
+    .skill-link:hover {
+      background: linear-gradient(135deg, var(--gold-d), var(--gold));
+      color: #0a0a1a;
+      border-color:transparent;
+      transform:translateY(-1px);
+      box-shadow: 0 0 14px rgba(201,168,76,.4);
+    }
+
+    /* ── SHARE ── */
+    .share-section {
+      padding: 1.5rem 2rem 1.8rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .share-title {
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.6px;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .share-btns {
+      display: flex; justify-content: center;
+      gap: .75rem; flex-wrap: wrap;
+    }
+    .btn-share {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .6rem 1.4rem;
+      border-radius: 100px;
+      font-family: 'Heebo', sans-serif;
+      font-size: .85rem; font-weight: 700;
+      cursor: pointer; border: none;
+      text-decoration: none;
+      transition: transform .18s, box-shadow .18s, filter .18s;
+    }
+    .btn-share:hover { transform: translateY(-2px); filter: brightness(1.12); }
+    .btn-share-wa {
+      background: #25d366;
+      color: #fff;
+      box-shadow: 0 0 16px rgba(37,211,102,.35), 0 4px 12px rgba(0,0,0,.3);
+    }
+    .btn-share-wa:hover { box-shadow: 0 0 28px rgba(37,211,102,.55), 0 4px 16px rgba(0,0,0,.35); }
+    .btn-share-mail {
+      background: transparent;
+      color: var(--gold-l);
+      border: 1.5px solid var(--gold);
+      box-shadow: 0 0 12px rgba(201,168,76,.2), 0 4px 12px rgba(0,0,0,.25);
+    }
+    .btn-share-mail:hover { background: rgba(201,168,76,.08); box-shadow: 0 0 24px rgba(201,168,76,.4), 0 4px 16px rgba(0,0,0,.3); }
+
+    .res-foot {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:1rem; flex-wrap:wrap;
+      padding:1.2rem 2.5rem 1.5rem;
+      border-top:1px solid var(--border);
+    }
+    .foot-links { display:flex; flex-direction:column; gap:.3rem; }
+    .foot-note { font-size:.78rem; color:var(--muted); }
+    .foot-note a { font-weight:700; color:var(--gold); text-decoration:none; }
+    .foot-note a:hover { color:var(--gold-l); text-decoration:underline; }
+
+    /* ── PERSONALITY CARD ── */
+    @keyframes personalityIn {
+      from { opacity:0; transform: scale(.88) translateY(16px); }
+      to   { opacity:1; transform: scale(1)   translateY(0); }
+    }
+    .personality-card {
+      margin: 1.5rem 1.8rem;
+      padding: 2rem 2rem 1.8rem;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(201,168,76,.08) 0%, rgba(15,15,38,.9) 60%, rgba(201,168,76,.05) 100%);
+      border: 1px solid rgba(201,168,76,.45);
+      box-shadow: 0 0 40px rgba(201,168,76,.18), 0 0 80px rgba(201,168,76,.06), var(--sh);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      animation: personalityIn .65s cubic-bezier(.22,1,.36,1) both;
+    }
+    .pt-emoji {
+      font-size: 80px;
+      line-height: 1;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 18px rgba(201,168,76,.5));
+    }
+    .pt-body { flex: 1; min-width: 0; }
+    .pt-label {
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.8px;
+      color: var(--gold);
+      margin-bottom: .3rem;
+    }
+    .pt-name {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--gold-d) 0%, var(--gold) 45%, var(--gold-l) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: .5rem;
+    }
+    .pt-tagline {
+      font-size: .95rem;
+      color: #e8e0cc;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+    @media (max-width:520px) {
+      .personality-card { flex-direction: column; text-align: center; margin: 1rem 1rem; padding: 1.5rem 1.2rem; }
+      .pt-emoji { font-size: 56px; }
+    }
+
+    /* ── RADAR ── */
+    .radar-section {
+      padding: 1.8rem 2rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .radar-eyebrow {
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.9px;
+      margin-bottom: 1.1rem;
+      color: var(--gold);
+      opacity: .8;
+    }
+    .radar-canvas-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .radar-legend {
+      display: flex; justify-content: center; align-items: center;
+      gap: 1.4rem; flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .rleg {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .73rem; font-weight: 600; color: var(--muted);
+    }
+    .rdot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .rdot-1 { background: var(--gold);   box-shadow: 0 0 0 3px rgba(201,168,76,.25); }
+    .rdot-2 { background: var(--gold-d); box-shadow: 0 0 0 3px rgba(154,114,48,.2); }
+    .rdot-3 { background: #7a5a28;       box-shadow: 0 0 0 3px rgba(122,90,40,.18); }
+    .rdot-rest { background: rgba(255,255,255,.2); }
+
+    /* ── WEF STATS STRIP ── */
+    .stats-strip {
+      background: linear-gradient(135deg, rgba(8,6,20,.95) 0%, rgba(12,9,28,.92) 50%, rgba(6,8,18,.95) 100%);
+      padding: 2rem 2.5rem 1.8rem;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-strip::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(ellipse at 15% 55%, rgba(201,168,76,.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 25%, rgba(201,168,76,.07) 0%, transparent 45%);
+      pointer-events: none;
+    }
+    .stats-strip::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(201,168,76,.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .stats-eyebrow {
+      font-size: .67rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(201,168,76,.75);
+      margin-bottom: 1.5rem;
+      position: relative; z-index: 1;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      position: relative; z-index: 1;
+    }
+
+    .stat-item {
+      padding: .5rem 1rem 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .stat-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 12%; bottom: 12%;
+      width: 1px;
+      background: rgba(201,168,76,.12);
+    }
+
+    .stat-num {
+      font-size: clamp(2rem, 6.5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: .45rem;
+      display: flex; align-items: baseline; justify-content: center; gap: 2px;
+    }
+    .counter {
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
+      text-shadow: 0 0 18px rgba(201,168,76,.7), 0 0 40px rgba(201,168,76,.3);
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-unit {
+      font-size: .38em; font-weight: 700;
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
+      text-shadow: 0 0 12px rgba(201,168,76,.6);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: .74rem; font-weight: 500;
+      color: #e8e0cc;
+      line-height: 1.55;
+      max-width: 140px;
+      margin: 0 auto;
+    }
+
+    .wef-divider { height: 1px; background: rgba(201,168,76,.12); margin: 1.3rem 0 1.2rem; position: relative; z-index:1; }
+
+    .wef-row {
+      display: flex; align-items: center;
+      gap: .8rem; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+
+    .wef-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(201,168,76,.08);
+      border: 1px solid var(--border);
+      padding: .35rem .95rem;
+      border-radius: 100px;
+      color: var(--gold-l);
+      font-size: .73rem; font-weight: 600;
+      flex-shrink: 0;
+    }
+    .wef-context {
+      font-size: .78rem;
+      color: rgba(240,240,240,.38);
+      line-height: 1.6;
+    }
+
+    /* ── LEARNING PATH ── */
+    .learning-path {
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+    .lp-header {
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.6px;
+      margin-bottom: .75rem;
+      background: linear-gradient(135deg, var(--gold-d) 0%, var(--gold) 50%, var(--gold-l) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .lp-steps { display: flex; flex-direction: column; gap: .6rem; }
+    .lp-step {
+      display: flex; align-items: flex-start; gap: .65rem;
+    }
+    .lp-num {
+      width: 22px; height: 22px; min-width: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-d) 0%, var(--gold) 100%);
+      color: #0a0a1a;
+      font-size: .65rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      box-shadow: 0 0 8px rgba(201,168,76,.35);
+    }
+    .lp-content { flex: 1; }
+    .lp-tag {
+      display: inline-block;
+      font-size: .65rem; font-weight: 700;
+      color: var(--gold);
+      background: rgba(201,168,76,.08);
+      border: 1px solid var(--border);
+      padding: .12rem .5rem;
+      border-radius: 100px;
+      margin-bottom: .25rem;
+    }
+    .lp-text {
+      font-size: .8rem; color: var(--muted);
+      line-height: 1.6; margin: 0;
+    }
+    .lp-link {
+      display: inline-flex; align-items: center;
+      font-size: .78rem; font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color .16s, text-shadow .16s;
+    }
+    .lp-link:hover { color: var(--gold-l); text-decoration: underline; text-shadow: 0 0 12px rgba(201,168,76,.5); }
+
+    /* ── MOBILE ── */
+    @media (max-width:520px) {
+      .hero-char { display: none; }
+      .hero { padding:2rem 1.5rem 2.5rem; }
+      .stats-strip { padding: 1.5rem; }
+      .stats-grid { gap: 0; }
+      .stat-num { font-size: clamp(1.7rem, 8vw, 2.4rem); }
+      .stat-label { font-size: .68rem; max-width: 90px; }
+      .wef-row { flex-direction: column; align-items: flex-start; gap: .6rem; }
+      .steps-wrap { padding:1.5rem; }
+      .steps-grid { grid-template-columns:1fr; gap:.8rem; }
+      .step { text-align:right; display:flex; align-items:flex-start; gap:.75rem; }
+      .step-num { margin:0; }
+      .cta-bar { padding:1.2rem 1.5rem 1.5rem; flex-direction:column; align-items:flex-start; }
+      .q-card { padding:1.5rem 1.2rem 1.8rem; }
+      .res-hero { padding:1.5rem; }
+      .res-body { padding:1.2rem 1.2rem 1.5rem; }
+      .res-foot { padding:1rem 1.2rem 1.2rem; flex-direction:column; align-items:flex-start; }
+    }
+
+    .site-footer-copy {
+      text-align: center;
+      font-size: 12px;
+      color: #8a7a5a;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(201,168,76,.15);
+      position: relative;
+      z-index: 1;
+      letter-spacing: .3px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-icon">
+      <!-- Recreated key-path icon matching thekey.mof.gov.il favicon -->
+      <svg width="21" height="21" viewBox="0 0 21 21" fill="none">
+        <path d="M10.5 3C10.5 3 5.5 5.5 5.5 10.5C5.5 13.538 7.962 16 11 16C11 16 14.5 16 14.5 12.5C14.5 10.567 12.933 9 11 9C10.033 9 9.25 9.784 9.25 10.75"
+              stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="11" cy="16" r="1.6" fill="#11BFC8"/>
+      </svg>
+    </div>
+    <div class="logo-labels">
+      <span class="l-main">המפתח שלי</span>
+      <span class="l-sub">פיתוח מיומנויות לשירות הציבורי</span>
+    </div>
+  </div>
+  <a href="https://thekey.mof.gov.il/gov-a-head" target="_blank" rel="noopener" class="hdr-link">
+    כל המיומנויות ←
+  </a>
+</header>
+
+<canvas id="stars-canvas"></canvas>
+<div class="wrap">
+
+  <!-- ═══ WELCOME ═══ -->
+  <div id="screen-welcome" class="screen active">
+    <div class="card">
+
+      <!-- Gradient hero -->
+      <div class="hero">
+        <div class="hero-body">
+          <div class="hero-content">
+            <img class="hero-logo" src="https://static.wixstatic.com/media/a4e1ac_644674d6f59241ffb0a1a6bb41b284e9~mv2.png" alt="GOV-A-HEAD" loading="eager">
+            <div class="hero-badge">✦ 22 שאלות · כ-4 דקות </div>
+            <h1 class="hero-title">העולם משתנה.<br>האם אתה מוכן?</h1>
+            <p class="hero-desc">
+              ענה/י על 22 משפטים קצרים ✦ דרג/י את עצמך בכנות ✦ קבל/י תמונה אישית של החוזקות שלך והמיומנויות שכדאי לפתח.
+            </p>
+          </div>
+          <img class="hero-char"
+               src="https://static.wixstatic.com/media/a4e1ac_9e279b36978549669c62b0daa3fcfa58~mv2.png/v1/fill/w_545,h_554,al_c,lg_1,q_85,enc_avif,quality_auto/%D7%9E%D7%95%D7%A4%D7%99.png"
+               alt="מופי — מדריכת GOV-A-HEAD"
+               loading="eager">
+        </div>
+        <!-- Decorative large key icon -->
+        <svg class="hero-deco" viewBox="0 0 100 100" fill="none">
+          <path d="M50 8C50 8 20 20 20 50C20 66.569 33.431 80 50 80C50 80 68 80 68 62C68 52.059 59.941 44 50 44C44.477 44 40 48.477 40 54"
+                stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="50" cy="80" r="9" fill="rgba(17,191,200,0.6)"/>
+        </svg>
+      </div>
+
+      <!-- WEF Stats Strip -->
+      <div class="stats-strip">
+        <div class="stats-eyebrow">נתונים · הפורום הכלכלי העולמי — Future of Jobs 2025</div>
+        <div class="stats-grid">
+
+          <div class="stat-item">
+            <div class="stat-num">
+              <span class="counter" data-target="85" data-suffix="">0</span>
+              <span class="stat-unit">מיליון</span>
+            </div>
+            <div class="stat-label">משרות יוחלפו על ידי אוטומציה עד 2025</div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-num">
+              <span class="counter" data-target="97" data-suffix="">0</span>
+              <span class="stat-unit">מיליון</span>
+            </div>
+            <div class="stat-label">תפקידים חדשים ייווצרו הדורשים מיומנויות חדשות</div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-num">
+              <span class="counter" data-target="50" data-suffix="">0</span>
+              <span class="stat-unit">%</span>
+            </div>
+            <div class="stat-label">מהעובדים יצטרכו לרכוש מיומנויות חדשות בשנים הקרובות</div>
+          </div>
+
+        </div>
+
+        <div class="wef-divider"></div>
+
+        <div class="wef-row">
+          <span class="wef-badge">
+            <!-- Globe icon -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            מבוסס על דו"ח הפורום הכלכלי העולמי 2025
+          </span>
+          <p class="wef-context">הכלי מסייע לעובדי ממשלה לגלות אילו מיומנויות העתיד רלוונטיות עבורם ביותר</p>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps-wrap">
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <div class="step-title">22 משפטים קצרים</div>
+              <div class="step-desc">דרג/י את עצמך בסולם 1–5 בכנות מלאה — כ-4 דקות</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">ניתוח מיידי</div>
+              <div class="step-desc">מנוע ניקוד חכם מחשב את המיומנויות המתאימות ביותר</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-title">תמונה אישית מלאה</div>
+              <div class="step-desc">החוזקות שלך + המיומנויות לפיתוח + סוג האישיות שלך</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-bar">
+        <div class="chips">
+          <span class="chip">חוסן אישי</span>
+          <span class="chip">חדשנות</span>
+          <span class="chip">השפעה</span>
+          <span class="chip">חשיבה מערכתית</span>
+          <span class="chip">ועוד 7...</span>
+        </div>
+        <button class="btn btn-grad" onclick="startQuiz()">בואו נתחיל ←</button>
+        <p class="privacy-note">🔒 הכלי אינו שומר את תשובותיך — כל המידע נשאר אצלך בלבד ולא נשלח לשום מקום</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ QUESTION ═══ -->
+  <div id="screen-question" class="screen">
+    <div class="prog-wrap">
+      <div class="prog-meta">
+        <span class="prog-label">ממלא/ת פרופיל מיומנויות · 22 שאלות</span>
+        <span class="prog-frac" id="prog-frac">1 / 5</span>
+      </div>
+      <div class="prog-track">
+        <div class="prog-fill" id="prog-fill" style="width:20%"></div>
+      </div>
+    </div>
+    <div class="card q-card">
+      <div class="q-eyebrow" id="q-eyebrow">שאלה 1</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options"></div>
+    </div>
+  </div>
+
+  <!-- ═══ CALCULATING ═══ -->
+  <div id="screen-calc" class="screen">
+    <div class="card calc-card">
+      <div class="spin-wrap">
+        <div class="ring ring-a"></div>
+        <div class="ring ring-b"></div>
+        <div class="ring-c">
+          <div class="ring-logo">
+            <svg width="17" height="17" viewBox="0 0 21 21" fill="none">
+              <path d="M10.5 3C10.5 3 5.5 5.5 5.5 10.5C5.5 13.538 7.962 16 11 16C11 16 14.5 16 14.5 12.5C14.5 10.567 12.933 9 11 9C10.033 9 9.25 9.784 9.25 10.75"
+                    stroke="white" stroke-width="1.9" stroke-linecap="round"/>
+              <circle cx="11" cy="16" r="1.6" fill="#11BFC8"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="calc-title">
+        מחשב/ת את הפרופיל שלך<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+      </div>
+      <p class="calc-sub">מתאים מיומנויות לפרופיל המקצועי שלך</p>
+    </div>
+  </div>
+
+  <!-- ═══ RESULTS ═══ -->
+  <div id="screen-results" class="screen">
+    <div class="card">
+      <div class="res-hero">
+        <div class="res-badge">✅ הניתוח הושלם</div>
+        <h2 class="res-title">פרופיל המיומנויות שלך</h2>
+      </div>
+      <!-- Personality type -->
+      <div id="personality-card" class="personality-card"></div>
+
+      <!-- Radar chart -->
+      <div class="radar-section">
+        <div class="radar-eyebrow">פרופיל המיומנויות המלא שלך — כל 11 המיומנויות</div>
+        <div class="radar-canvas-wrap">
+          <canvas id="radarChart"></canvas>
+        </div>
+        <div class="radar-legend">
+          <span class="rleg"><span class="rdot rdot-1"></span>מיומנות מובילה</span>
+          <span class="rleg"><span class="rdot rdot-2"></span>מיומנות שנייה</span>
+          <span class="rleg"><span class="rdot rdot-3"></span>מיומנות שלישית</span>
+          <span class="rleg"><span class="rdot rdot-rest"></span>שאר המיומנויות</span>
+        </div>
+      </div>
+
+      <div class="res-body" id="results-body"></div>
+
+      <div class="share-section">
+        <div class="share-title">שתפו את התוצאות עם עמיתים</div>
+        <div class="share-btns">
+          <a id="share-wa" class="btn-share btn-share-wa" href="#" target="_blank" rel="noopener">💬 שתף/י בוואטסאפ</a>
+          <a id="share-mail" class="btn-share btn-share-mail" href="#">✉️ שלח/י במייל</a>
+        </div>
+      </div>
+
+      <div class="res-foot">
+        <div class="foot-links">
+          <p class="foot-note">
+            גלה את כל 11 המיומנויות ב-<a href="https://thekey.mof.gov.il/gov-a-head" target="_blank" rel="noopener">פורטל המפתח</a>
+          </p>
+          <p class="foot-note">
+            🌍 דירוגי WEF מתוך <a href="https://www.weforum.org/publications/the-future-of-jobs-report-2025/" target="_blank" rel="noopener">Future of Jobs Report 2025</a>
+          </p>
+        </div>
+        <button class="btn btn-ghost" onclick="restart()">ענה/י מחדש</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer class="site-footer-copy">
+  🔑 © 2025 אלמוג פייל | מינהלת הלמידה והפיתוח — החשכ"ל | כל הזכויות שמורות
+</footer>
+
+<script>
+/* ════════════════════════════════════════════
+   SKILLS
+════════════════════════════════════════════ */
+/* wef = global ranking in WEF Future of Jobs 2025 */
+const SKILLS = [
+  { name:'חוסן אישי וארגוני',         url:'https://thekey.mof.gov.il/resilience1',   wef:10 },
+  { name:'מודעות עצמית והנעה פנימית', url:'https://thekey.mof.gov.il/motivation',     wef:9  },
+  { name:'יכולת השפעה והנעת אחרים',   url:'https://thekey.mof.gov.il/influence',      wef:6  },
+  { name:'חוסן טכנולוגי',             url:'https://thekey.mof.gov.il/digital',        wef:3  },
+  { name:'הסתגלות לשינויים',          url:'https://thekey.mof.gov.il/changes',        wef:5  },
+  { name:'ניהול ירוק וקיימות',        url:'https://thekey.mof.gov.il/sustainability', wef:11 },
+  { name:'חשיבה מערכתית',             url:'https://thekey.mof.gov.il/broadthinking',  wef:8  },
+  { name:'אמפתיה והקשבה פעילה',      url:'https://thekey.mof.gov.il/empathy',        wef:7  },
+  { name:'סקרנות ולמידה מתמדת',      url:'https://thekey.mof.gov.il/learning',       wef:4  },
+  { name:'חדשנות וחשיבה יצירתית',    url:'https://thekey.mof.gov.il/inovation',      wef:2  },
+  { name:'חשיבה אנליטית וביקורתית',  url:'https://thekey.mof.gov.il/analytic',       wef:1  }
+];
+
+/* skill index → official image URL (null = not yet available) */
+const SKILL_IMAGES = [
+  'https://static.wixstatic.com/media/a4e1ac_fadc8b2478cc42308447d929a53ef286~mv2.png', /* 0 חוסן אישי */
+  'https://static.wixstatic.com/media/a4e1ac_a84cc579cb0b4fc5b04ed000d18755b5~mv2.png', /* 1 מודעות עצמית */
+  'https://static.wixstatic.com/media/a4e1ac_ff6fb7b07fe6493187e3237735bab294~mv2.png', /* 2 יכולת השפעה */
+  'https://static.wixstatic.com/media/a4e1ac_23f5834c21f14060a86d5e4c5026cffe~mv2.png', /* 3 חוסן טכנולוגי */
+  'https://static.wixstatic.com/media/a4e1ac_6db7d384757245ed98fd0fc433790123~mv2.png', /* 4 הסתגלות */
+  'https://static.wixstatic.com/media/a4e1ac_3eaac638ed924e4abc15296bf20a97fe~mv2.png', /* 5 ניהול ירוק */
+  'https://static.wixstatic.com/media/2c6e84_e70df5011025420da94f2b3f3991a2dc~mv2.png', /* 6 חשיבה מערכתית */
+  'https://static.wixstatic.com/media/a4e1ac_0917146358c64125be07ef52caa172a6~mv2.png', /* 7 אמפתיה */
+  'https://static.wixstatic.com/media/a4e1ac_dbec64d5abd5434a80dac394986e9fce~mv2.png', /* 8 סקרנות ולמידה */
+  'https://static.wixstatic.com/media/a4e1ac_8cad626e654d40c7890e4feeb3b8836f~mv2.png', /* 9 חדשנות */
+  'https://static.wixstatic.com/media/a4e1ac_e872b506de1a4af08519ecc27f0165a9~mv2.png'  /* 10 חשיבה אנליטית */
+];
+
+/* ════════════════════════════════════════════
+   PERSONALITY TYPES
+   skills: indices into SKILLS / scores arrays
+   0=חוסן, 1=מודעות, 2=השפעה, 3=טכנולוגי, 4=הסתגלות,
+   5=ירוק,  6=מערכתית, 7=אמפתיה, 8=סקרנות, 9=חדשנות, 10=אנליטית
+════════════════════════════════════════════ */
+const PERSONALITY_TYPES = [
+  { emoji:'🦁', name:'האריה — המוביל/ה',    skills:[2,0],  tagline:'את/ה זה/זו שאנשים מסתכלים אליו/ה כשהדברים מסתבכים' },
+  { emoji:'🦉', name:'הינשוף — החושב/ת',    skills:[6,10], tagline:'את/ה רואה את התמונה הגדולה כשאחרים רואים רק את הפרטים' },
+  { emoji:'🦋', name:'הפרפר — המסתגל/ת',    skills:[4,9],  tagline:'שינויים לא מפחידים אותך — הם מרגשים אותך' },
+  { emoji:'🌱', name:'הגנן/ת — המטפח/ת',    skills:[7,5],  tagline:'את/ה בונה את הסביבה שבה אנשים פורחים' },
+  { emoji:'🚀', name:'החלל — החדשן/ית',     skills:[3,8],  tagline:'את/ה תמיד צעד אחד לפני — לומד/ת לפני שזה הופך לחובה' },
+  { emoji:'⚡', name:'הברק — העמיד/ה',      skills:[0,1],  tagline:'נפילות הן רק נקודת הזינוק הבאה שלך' }
+];
+
+function computePersonality(scores) {
+  let best = PERSONALITY_TYPES[0], bestAvg = -1;
+  for (const type of PERSONALITY_TYPES) {
+    const avg = type.skills.reduce((sum, i) => sum + (scores[i] || 0), 0) / type.skills.length;
+    if (avg > bestAvg) { bestAvg = avg; best = type; }
+  }
+  return best;
+}
+
+/* ════════════════════════════════════════════
+   QUESTIONS
+════════════════════════════════════════════ */
+/* 11 self-rating questions — index matches SKILLS index */
+/* 22 questions — pairs per skill: Q[i*2], Q[i*2+1] → skill i */
+const QUESTIONS = [
+  /* 0 – חוסן אישי וארגוני */
+  'כשמשהו לא הולך כפי שתכננתי בעבודה — אני מתאושש/ת ומוצא/ת דרך חדשה במהירות',
+  'גם בתקופות לחץ ואי-ודאות — אני ממשיך/ה לתפקד ביעילות',
+  /* 1 – מודעות עצמית והנעה פנימית */
+  'אני יודע/ת מה מניע אותי בעבודה ומה גורם לי לאבד עניין',
+  'אני פועל/ת מתוך ערכים ברורים — גם כשיש לחץ לעשות אחרת',
+  /* 2 – יכולת השפעה והנעת אחרים */
+  'אנשים סביבי מאמצים רעיונות שלי ומשתפים אותי בהחלטות',
+  'אני יודע/ת איך לגרום לאנשים שונים להתלהב ולפעול',
+  /* 3 – חוסן טכנולוגי */
+  'כשמכניסים מערכת או כלי דיגיטלי חדש — אני מסתדר/ת לבד בלי הרבה עזרה',
+  'אני משתמש/ת בכלים דיגיטליים כדי לעבוד חכם יותר, לא רק יותר מהר',
+  /* 4 – הסתגלות לשינויים */
+  'שינויים פתאומיים בעבודה לא מפריעים לי — אני מתאים/מה את עצמי ומתקדם/ת',
+  'אני רואה בשינויים הזדמנות ולא איום',
+  /* 5 – ניהול ירוק וקיימות */
+  'אני שוקל/ת השפעות סביבתיות וחברתיות כשאני מקבל/ת החלטות בעבודה',
+  'אני פועל/ת לצמצום בזבוז ושיפור היעילות בתהליכים שאני אחראי/ת עליהם',
+  /* 6 – חשיבה מערכתית */
+  'אני רואה איך ההחלטות שלי משפיעות על גורמים אחרים — מחוץ לתחום האחריות הישיר שלי',
+  'כשיש בעיה — אני מחפש/ת את שורש הבעיה ולא רק את הפתרון המיידי',
+  /* 7 – אמפתיה והקשבה פעילה */
+  'אנשים מרגישים שאני באמת מקשיב/ה להם — לא רק ממתין/ה לדבר',
+  'אני מצליח/ה להבין את נקודת המבט של אנשים שונים ממני — גם כשאני לא מסכים/ה',
+  /* 8 – סקרנות ולמידה מתמדת */
+  'אני יוזם/ת ללמוד דברים חדשים — גם כשאף אחד לא מבקש ממני',
+  'אני מביא/ה רעיונות מתחומים אחרים לעבודה שלי',
+  /* 9 – חדשנות וחשיבה יצירתית */
+  'אני מציע/ה פתרונות שונים מהרגיל ולא מסתפק/ת בדרך שתמיד עשו',
+  'אני יוזם/ת שיפורים בתהליכים — גם כשלא מבקשים ממני',
+  /* 10 – חשיבה אנליטית וביקורתית */
+  'לפני שאני מחליט/ה — אני בודק/ת נתונים, שואל/ת שאלות ולא מקבל/ת דברים כמובן מאליו',
+  'אני מזהה/ה כשטיעון לא מחזיק מים — גם אם כולם סביבי מסכימים איתו'
+];
+
+const RATING_LABELS = ['כמעט אף פעם 😔', '', 'לפעמים 😐', '', 'תמיד 💪'];
+
+/* ════════════════════════════════════════════
+   EXPLANATIONS [skill][role]
+   role: 0=manager 1=expert 2=executor 3=liaison 4=senior
+════════════════════════════════════════════ */
+/* Flat array — one universal description per skill (any role, any seniority) */
+const REASONS = [
+  /* 0 – חוסן אישי וארגוני */
+  "עובד/ת עם חוסן גבוה ממשיך/ה לתפקד ביעילות גם כשהדברים לא הולכים לפי התכנית — ובסביבת שירות ציבורי עמוסת שינויים, זה יתרון שחוסך עצבים ומשמר ביצועים לאורך זמן. חוסן לא אומר לא לדאוג — אלא לדאוג ולהמשיך קדימה. הרגל: בסוף כל יום קשה, רשום/י דבר אחד שהצלחת לעשות בו — זה מחזיר תחושת שליטה ומזין את היום הבא.",
+  /* 1 – מודעות עצמית והנעה פנימית */
+  "עובד/ת שיודע/ת מה מניע אותו/ה — עובד/ת בצורה ממוקדת יותר ושורד/ת שחיקה טוב יותר. מודעות עצמית עוזרת לך לבחור איפה להשקיע אנרגיה ומתי לשים גבולות. ניסוי: בסוף כל שבוע, שאל/י את עצמך — אלו משימות הסתיימתי אחריהן עם יותר אנרגיה? — התשובות מלמדות אותך מה מניע אותך באמת.",
+  /* 2 – יכולת השפעה והנעת אחרים */
+  "יכולת להניע אנשים סביבך — עמיתים, ממונים ולקוחות פנימיים — היא כוח שעובד/ת בכל תפקיד ובכל דרג. ההשפעה לא מגיעה מסמכות פורמלית, אלא מאמון ומהבנת מה חשוב לאנשים האחרים. אתגר: לפני שמציג/ה רעיון בפגישה הקרובה, שאל/י את עצמך — מה האינטרס של מי שמולי? — ובנה/י מהמקום הזה.",
+  /* 3 – חוסן טכנולוגי */
+  "עובד/ת שמבין/ה ומשתמש/ת בכלים דיגיטליים עובד/ת חכם יותר, חוסך/ת זמן ומוביל/ה שינוי בסביבה שלו/ה. חוסן טכנולוגי לא אומר להיות מומחה/ית — אלא להיות סקרן/ית ולא לפחד לנסות. ניסוי: בשבוע הקרוב, נסה/י כלי דיגיטלי חדש אחד — ושתף/י עמית/ה במה שלמדת.",
+  /* 4 – הסתגלות לשינויים */
+  "שינויים בשירות הציבורי הם לא חריג — הם הכלל. עובד/ת שמסתגל/ת מהר חוסך/ת לעצמו/ה הרבה אנרגיה ונשאר/ת רלוונטי/ת גם כשמה שהיה נכון אתמול כבר לא תקף היום. בפעם הבאה שמגיע שינוי, שאל/י: מה אפשרי עכשיו שלא היה אפשרי קודם? — לרוב יש שם הזדמנות שלא ראית.",
+  /* 5 – ניהול ירוק וקיימות */
+  "כל עובד/ת בשירות הציבורי מקבל/ת החלטות שיש להן השפעה — גדולה או קטנה — על הסביבה ועל הקהילה. ניהול ירוק לא דורש תואר מיוחד: הוא מתחיל בתשומת לב לשאלה מה ההשפעה של מה שאני עושה? אתגר: בחר/י השבוע פעולה אחת קטנה שמפחיתה בזבוז בעבודה שלך — ושתף/י עמית/ה, כי שינוי מתפשט דרך דוגמה.",
+  /* 6 – חשיבה מערכתית */
+  "עובד/ת שמבין/ה שפעולה בנקודה אחת משפיעה על נקודות אחרות — יכול/ה לפעול חכם יותר, לצפות בעיות ולמנוע טעויות שנראות מפתיעות לאחרים. חשיבה מערכתית לא דורשת ניסיון בכיר — היא דורשת סקרנות ורצון להבין. הרגל: לפני כל פעולה משמעותית, שאל/י — מי עוד מושפע מזה? — שאלה אחת, תובנות רבות.",
+  /* 7 – אמפתיה והקשבה פעילה */
+  "עובדים שמקשיבים באמת — יוצרים אמון, פותרים בעיות מהר יותר ומשפיעים יותר על הסביבה שלהם. אמפתיה היא לא רק מיומנות רכה — היא הבסיס לשיתוף פעולה אמיתי. אתגר: בשבוע הקרוב, בכל שיחה עם עמית/ה — הקשב/י 80% ודבר/י 20%.",
+  /* 8 – סקרנות ולמידה מתמדת */
+  "עובד/ת שלומד/ת ולא מפסיק/ה — נשאר/ת רלוונטי/ת, מעניין/ת ומסוגל/ת להתמודד עם אתגרים שעוד לא הגיעו. סקרנות היא מנוע שלא תלוי בתקציב, בניסיון או בדרג — היא תלויה רק בך. הרגל: הקדש/י 15 דקות בשבוע לנושא שסקרן/ית לגביו — ותגלה/י כמה זה מזין את החשיבה שלך גם בתוך העבודה.",
+  /* 9 – חדשנות וחשיבה יצירתית */
+  "רעיון טוב יכול לצמוח מכל תפקיד ומכל דרג — לא רק ממחלקות חדשנות. עובד/ת שמציע/ה פתרונות חדשים לבעיות ישנות יוצר/ת ערך אמיתי ונהיה/ת שם עצם שאנשים מביאים אליו/ה בעיות. ניסוי: שאל/י את עצמך פעם בשבוע — מה אנחנו עושים כי תמיד עשינו כך? — ובדוק/י אם יש דרך אחרת שלא ניסו.",
+  /* 10 – חשיבה אנליטית וביקורתית */
+  "עובד/ת שבודק/ת, שואל/ת ולא מקבל/ת דברים כמובן מאליו — מקבל/ת החלטות טובות יותר ומשפיע/ה על איכות העבודה סביבו/ה. חשיבה ביקורתית היא לא ציניות — זו יכולת לשאול את השאלות שאחרים לא שאלו. הרגל: לפני כל החלטה, שאל/י — מה אנחנו מניחים כאן שלא בדקנו? — לרוב התשובה משנה הכל."
+];
+
+const SUMMARIES = [
+  "פרופיל ניהולי עם מיקוד בפיתוח אנשים ויצירת תוצאות קבוצתיות מצוינות",
+  "פרופיל מקצועי-מומחה עם זיקה לעומק ידע ולמצוינות תחומית",
+  "פרופיל ביצועי עם נטייה לדייקנות, יעילות תפעולית ועמידה ביעדים",
+  "פרופיל ממשקי עם כישורי גישור, תיאום ועבודה רב-גורמית",
+  "פרופיל מנהיגות בכירה עם אחריות ארגונית רחבה ומיקוד אסטרטגי"
+];
+
+/* ════════════════════════════════════════════
+   LEARNING PATHS  [skill] → {day, week, url}
+════════════════════════════════════════════ */
+const LEARNING_PATHS = [
+  /* 0 – חוסן אישי */
+  { day:'כתוב/י 3 אתגרים שהתמודדת איתם בחודש האחרון — ולצד כל אחד, מה עזר לך לעבור אותו',
+    week:'הגדר/י שגרת אפס יומית קטנה שעוזרת לך לחדש אנרגיה — 5 דקות הליכה, 3 נשימות עמוקות, או קפה בלי מסך',
+    url:'https://thekey.mof.gov.il/resilience1' },
+  /* 1 – מודעות עצמית */
+  { day:'שאל/י את עצמך: מה 3 הדברים שאם הייתי עושה יותר מהם — הייתי מרוצה יותר מעבודתי?',
+    week:'הפנה/י 20 דקות לכתוב: מה מניע אותי? מה מעייף אותי? האם הם מאוזנים בעבודה שלי?',
+    url:'https://thekey.mof.gov.il/motivation' },
+  /* 2 – השפעה */
+  { day:'חשוב/י על מישהו בארגון שצריך לשתף פעולה איתך — ושאל/י: מה הכי חשוב לו/לה כרגע?',
+    week:'תרגל/י שיחת השפעה: פגישה קצרה עם עמית/ה שבה אתה/את מקשיב/ה יותר ממה שאתה/את מדבר/ת, ואז מציג/ה הצעה',
+    url:'https://thekey.mof.gov.il/influence' },
+  /* 3 – חוסן טכנולוגי */
+  { day:'בחר/י כלי דיגיטלי שיש בעבודתך שאתה/את לא משתמש/ת בו מספיק — וקרא/י על יכולת אחת שלו שלא ידעת',
+    week:'הקדש/י 30 דקות לגלישת טכנולוגיה: מה חדש בכלים שהארגון שלך משתמש בהם? מה מגיע בקרוב?',
+    url:'https://thekey.mof.gov.il/digital' },
+  /* 4 – הסתגלות */
+  { day:'חשוב/י על שינוי שמגיע לעבודתך בקרוב — ורשום/י שלושה דברים שיכולים להיות בו טובים עבורך',
+    week:'זהה/י שגרה שאתה/את עושה כי תמיד עשית כך — ונסה/י פעם אחת לעשות אותה אחרת',
+    url:'https://thekey.mof.gov.il/changes' },
+  /* 5 – קיימות */
+  { day:'בחר/י פעולה ירוקה אחת שתוכל/י לשלב בעבודה השבוע — הדפסה פחות, פגישה מרחוק, או רכישה מושכלת',
+    week:'קרא/י על יוזמת קיימות ממשלתית אחת שקורית בישראל — ובדוק/י אם יש קשר לתחום שלך',
+    url:'https://thekey.mof.gov.il/sustainability' },
+  /* 6 – חשיבה מערכתית */
+  { day:'בחר/י תהליך אחד בעבודה ושרטט/י אותו: מי מעורב? מה נכנס ומה יוצא? מה יכול להשתבש?',
+    week:'בפגישה הקרובה, שאל/י שאלה אחת שמסתכלת על ההשלכות הרחבות: מה קורה אם... — ותראה/י לאן זה מוביל',
+    url:'https://thekey.mof.gov.il/broadthinking' },
+  /* 7 – אמפתיה */
+  { day:'בשיחה הבאה שלך, נסה/י לחזור על מה ששמעת לפני שאתה/את מגיב/ה: אז מה שאתה/את אומר/ת זה...',
+    week:'קיים/י שיחת צ\'ק-אין קצרה עם עמית/ה — לא על עבודה, אלא על איך הם מרגישים כרגע',
+    url:'https://thekey.mof.gov.il/empathy' },
+  /* 8 – למידה */
+  { day:'פתח/י פודקאסט, מאמר או סרטון על נושא שתמיד סקרן/ית לגביו — והקדש/י לו 10 דקות',
+    week:'הגדר/י שעת למידה קבועה שבועית ביומן — ושמור/י עליה כמו ישיבה חשובה',
+    url:'https://thekey.mof.gov.il/learning' },
+  /* 9 – חדשנות */
+  { day:'כתוב/י 5 רעיונות לשיפור משהו בעבודה — ללא ביקורת, גם אם נשמעים מטורפים',
+    week:'שתף/י עמית/ה קרוב/ה בבעיה שיש לך ובקש/י: תן/י לי פתרון שאני לא הייתי חושב/ת עליו',
+    url:'https://thekey.mof.gov.il/inovation' },
+  /* 10 – אנליטיקה */
+  { day:'בחר/י החלטה שקיבלת לאחרונה — ורשום/י: מה הנחות שהיו לי? מה נתונים אספת? מה היה חסר?',
+    week:'בפגישה הקרובה, כשמגיעה טענה — שאל/י: על מה מבוסס זה? — לא כהתנגדות, אלא כסקרנות',
+    url:'https://thekey.mof.gov.il/analytic' }
+];
+
+/* Short labels for the radar chart */
+const RADAR_LABELS = [
+  'חוסן אישי',
+  'הנעה פנימית',
+  'השפעה',
+  'חוסן דיגיטלי',
+  'הסתגלות',
+  'קיימות',
+  'חשיבה מערכתית',
+  'אמפתיה',
+  'למידה',
+  'חדשנות',
+  'חשיבה אנליטית'
+];
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let currentQ = 0;
+let answers  = [];
+
+/* ════════════════════════════════════════════
+   SCREEN
+════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  el.style.display = 'none';
+  void el.offsetWidth;
+  el.style.display = '';
+  el.classList.add('active');
+}
+
+/* ════════════════════════════════════════════
+   FLOW
+════════════════════════════════════════════ */
+function startQuiz() {
+  currentQ = 0; answers = [];
+  renderQuestion(0);
+  showScreen('question');
+}
+
+function renderQuestion(index) {
+  const pct = ((index + 1) / QUESTIONS.length) * 100;
+
+  document.getElementById('prog-frac').textContent = `${index + 1} / ${QUESTIONS.length}`;
+  document.getElementById('prog-fill').style.width  = pct + '%';
+  document.getElementById('q-eyebrow').textContent  = `${SKILLS[Math.floor(index / 2)].name} · שאלה ${index + 1} מתוך ${QUESTIONS.length}`;
+  document.getElementById('q-text').textContent     = QUESTIONS[index];
+
+  const container = document.getElementById('options');
+  container.innerHTML = '';
+  container.className = 'rating-opts';
+
+  [1,2,3,4,5].forEach(val => {
+    const btn = document.createElement('button');
+    btn.className = 'rating-btn';
+    btn.type = 'button';
+    btn.dataset.val = val;
+    const label = RATING_LABELS[val - 1];
+    btn.innerHTML =
+      `<span class="rating-num">${val}</span>` +
+      (label ? `<span class="rating-label">${escHtml(label)}</span>` : '');
+    btn.addEventListener('click', () => pickRating(index, val, container));
+    container.appendChild(btn);
+  });
+}
+
+function pickRating(qIndex, value, container) {
+  if (container.dataset.locked) return;
+  container.dataset.locked = '1';
+
+  container.querySelectorAll('.rating-btn').forEach(b => {
+    b.classList.remove('selected');
+    b.disabled = true;
+    if (parseInt(b.dataset.val) === value) b.classList.add('selected');
+  });
+  answers[qIndex] = value;
+
+  setTimeout(() => {
+    delete container.dataset.locked;
+    if (qIndex < QUESTIONS.length - 1) {
+      currentQ = qIndex + 1;
+      renderQuestion(currentQ);
+    } else {
+      showScreen('calc');
+      setTimeout(() => showResults(computeResults()), 750);
+    }
+  }, 380);
+}
+
+/* ════════════════════════════════════════════
+   SCORING
+════════════════════════════════════════════ */
+function computeResults() {
+  /* each skill score = average of its two question ratings */
+  const scores = SKILLS.map((_, si) => {
+    const a = answers[si * 2] || 3;
+    const b = answers[si * 2 + 1] || 3;
+    return (a + b) / 2;
+  });
+
+  const ranked = scores
+    .map((score, idx) => ({ score, idx }))
+    .sort((a, b) => b.score - a.score || a.idx - b.idx);
+
+  const mkCard = ({ idx }) => ({
+    skill:  SKILLS[idx],
+    reason: REASONS[idx],
+    path:   LEARNING_PATHS[idx],
+    img:    SKILL_IMAGES[idx] || null,
+    score:  scores[idx]
+  });
+
+  return {
+    scores,
+    ranked,
+    top3:    ranked.slice(0, 3).map(mkCard),
+    bottom3: ranked.slice(-3).reverse().map(mkCard)
+  };
+}
+
+/* ════════════════════════════════════════════
+   RESULTS
+════════════════════════════════════════════ */
+let radarInstance = null;
+
+/* Chart.js plugin: gradient fill computed after layout */
+const radarGradientPlugin = {
+  id: 'radarGradientFill',
+  beforeDatasetDraw(chart, args) {
+    const r = chart.scales.r;
+    if (!r) return;
+    const ctx  = chart.ctx;
+    const cx   = r.xCenter;
+    const cy   = r.yCenter;
+    const draw = r.drawingArea;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, draw);
+    grad.addColorStop(0,    'rgba(201,168,76, 0.38)');
+    grad.addColorStop(0.55, 'rgba(154,114,48, 0.22)');
+    grad.addColorStop(1,    'rgba(201,168,76, 0.04)');
+    chart.data.datasets[args.index].backgroundColor = grad;
+  }
+};
+
+function drawRadar(scores, top3Indices) {
+  if (radarInstance) { radarInstance.destroy(); radarInstance = null; }
+
+  const TOP_COLORS = ['#c9a84c', '#9a7230', '#e8c87a'];
+  const maxScore   = Math.max(...scores, 1);
+
+  const ptBg     = scores.map((_, i) => { const r = top3Indices.indexOf(i); return r >= 0 ? TOP_COLORS[r] : 'rgba(100,116,139,0.35)'; });
+  const ptBorder = scores.map((_, i) => { const r = top3Indices.indexOf(i); return r >= 0 ? TOP_COLORS[r] : 'rgba(100,116,139,0.5)'; });
+  const ptRadius = scores.map((_, i) => top3Indices.includes(i) ? 7 : 3.5);
+  const ptHover  = scores.map((_, i) => top3Indices.includes(i) ? 9 : 5);
+
+  const ctx = document.getElementById('radarChart').getContext('2d');
+
+  radarInstance = new Chart(ctx, {
+    type: 'radar',
+    plugins: [radarGradientPlugin],
+    data: {
+      labels: RADAR_LABELS,
+      datasets: [{
+        data: scores,
+        backgroundColor: 'rgba(201,168,76,0.12)', /* overridden by plugin */
+        borderColor: 'rgba(201,168,76,0.65)',
+        borderWidth: 2,
+        pointBackgroundColor: ptBg,
+        pointBorderColor: ptBorder,
+        pointBorderWidth: 2,
+        pointRadius: ptRadius,
+        pointHoverRadius: ptHover,
+        pointHoverBorderWidth: 2.5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          rtl: true,
+          textDirection: 'rtl',
+          bodyFont: { family: "'Heebo', Arial, sans-serif", size: 13 },
+          titleFont: { family: "'Heebo', Arial, sans-serif", size: 13, weight: 'bold' },
+          callbacks: {
+            title: (items) => RADAR_LABELS[items[0].dataIndex],
+            label: (item) => {
+              const rank = top3Indices.indexOf(item.dataIndex);
+              const rankStr = rank === 0 ? ' ⭐ מוביל/ה' : rank === 1 ? ' ✦ שני/ה' : rank === 2 ? ' ✧ שלישי/ת' : '';
+              return `ניקוד: ${item.raw}${rankStr}`;
+            }
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: maxScore + 1,
+          ticks: { display: false, stepSize: 1 },
+          grid: {
+            color: 'rgba(201,168,76,0.1)',
+            lineWidth: 1
+          },
+          angleLines: {
+            color: 'rgba(201,168,76,0.12)',
+            lineWidth: 1
+          },
+          pointLabels: {
+            font: (ctx) => ({
+              family: "'Heebo', Arial, sans-serif",
+              size: top3Indices.includes(ctx.index) ? 12 : 11,
+              weight: top3Indices.includes(ctx.index) ? '700' : '500'
+            }),
+            color: (ctx) => {
+              const rank = top3Indices.indexOf(ctx.index);
+              if (rank === 0) return '#c9a84c';
+              if (rank === 1) return '#9a7230';
+              if (rank === 2) return '#e8c87a';
+              return 'rgba(240,240,240,0.4)';
+            },
+            padding: 8
+          }
+        }
+      }
+    }
+  });
+}
+
+function buildSkillCard(item, variant) {
+  const { skill, reason, path, img } = item;
+  const wefClass = skill.wef <= 3 ? 'wef-top' : 'wef-mid';
+  const wefIcon  = skill.wef <= 3 ? '🥇' : '🌍';
+  const card = document.createElement('div');
+  card.className = `skill-card${variant === 'growth' ? ' skill-card-growth' : ''}`;
+  const imgHtml = img
+    ? `<div class="skill-img-wrap"><img class="skill-img" src="${escHtml(img)}" alt="${escHtml(skill.name)}" loading="lazy"></div>`
+    : '';
+  card.innerHTML =
+    imgHtml +
+    `<div class="skill-top">` +
+      `<div class="skill-name-wrap">` +
+        `<div class="skill-name">${escHtml(skill.name)}</div>` +
+        `<span class="wef-rank-badge ${wefClass}">${wefIcon} מיומנות #${skill.wef} בדו"ח הפורום הכלכלי העולמי 2025</span>` +
+      `</div>` +
+    `</div>` +
+    `<p class="skill-reason">${escHtml(reason)}</p>` +
+    `<div class="learning-path">` +
+      `<div class="lp-header">מסלול הלמידה שלי</div>` +
+      `<div class="lp-steps">` +
+        `<div class="lp-step"><div class="lp-num">1</div><div class="lp-content"><span class="lp-tag">היום · 5 דקות</span><p class="lp-text">${escHtml(path.day)}</p></div></div>` +
+        `<div class="lp-step"><div class="lp-num">2</div><div class="lp-content"><span class="lp-tag">השבוע</span><p class="lp-text">${escHtml(path.week)}</p></div></div>` +
+        `<div class="lp-step"><div class="lp-num">3</div><div class="lp-content"><span class="lp-tag">למידה מעמיקה</span><a href="${escHtml(path.url)}" class="lp-link" target="_blank" rel="noopener">← לתוכן בפורטל המפתח</a></div></div>` +
+      `</div>` +
+    `</div>`;
+  return card;
+}
+
+function showResults({ top3, bottom3, scores, ranked }) {
+  const top3Indices = ranked.slice(0, 3).map(r => r.idx);
+
+  /* ── Personality type ── */
+  const pt = computePersonality(scores);
+  const pcEl = document.getElementById('personality-card');
+  pcEl.innerHTML =
+    `<div class="pt-emoji">${pt.emoji}</div>` +
+    `<div class="pt-body">` +
+      `<div class="pt-label">סוג האישיות שלך</div>` +
+      `<div class="pt-name">${escHtml(pt.name)}</div>` +
+      `<div class="pt-tagline">"${escHtml(pt.tagline)}"</div>` +
+    `</div>`;
+  /* re-trigger animation on each result show */
+  pcEl.style.animation = 'none';
+  pcEl.offsetWidth; /* reflow */
+  pcEl.style.animation = '';
+
+  const body = document.getElementById('results-body');
+  body.innerHTML =
+    `<div class="results-section-header results-strengths-header">` +
+      `<span class="rs-icon">🏆</span>` +
+      `<div><div class="rs-title">החוזקות שלך</div><div class="rs-sub">כבר יש לך את זה — המשך/י לטפח</div></div>` +
+    `</div>` +
+    `<div id="cards-strengths" class="results-cards"></div>` +
+    `<div class="results-section-header results-growth-header">` +
+      `<span class="rs-icon">🌱</span>` +
+      `<div><div class="rs-title">להמשך פיתוח</div><div class="rs-sub">כאן יש לך הזדמנות לצמוח</div></div>` +
+    `</div>` +
+    `<div id="cards-growth" class="results-cards"></div>`;
+
+  const strengthsEl = document.getElementById('cards-strengths');
+  const growthEl    = document.getElementById('cards-growth');
+
+  top3.forEach(item    => strengthsEl.appendChild(buildSkillCard(item, 'strength')));
+  bottom3.forEach(item => growthEl.appendChild(buildSkillCard(item, 'growth')));
+
+  /* ── Share links ── */
+  const topSkillName = top3[0]?.skill?.name || '';
+  const toolUrl      = window.location.href.split('?')[0];
+  const shareMsg     = `גיליתי את המיומנויות העתידיות שלי! הסוג שלי: ${pt.emoji} ${pt.name}. המיומנות המובילה שלי היא: ${topSkillName}. גלה/י גם את שלך 👉 ${toolUrl}`;
+  document.getElementById('share-wa').href   = `https://wa.me/?text=${encodeURIComponent(shareMsg)}`;
+  document.getElementById('share-mail').href = `mailto:?subject=${encodeURIComponent('המיומנויות העתידיות שלי')}&body=${encodeURIComponent(shareMsg)}`;
+
+  showScreen('results');
+
+  /* Draw radar after screen is visible so canvas has dimensions */
+  requestAnimationFrame(() => drawRadar(scores, top3Indices));
+}
+
+function restart() { currentQ = 0; answers = []; showScreen('welcome'); }
+
+/* ════════════════════════════════════════════
+   COUNT-UP ANIMATION
+════════════════════════════════════════════ */
+function runCounters() {
+  document.querySelectorAll('.counter').forEach(el => {
+    const target   = parseInt(el.dataset.target, 10);
+    const duration = 1800;
+    const startTs  = performance.now();
+
+    function tick(now) {
+      const elapsed  = now - startTs;
+      const progress = Math.min(elapsed / duration, 1);
+      /* easeOutExpo — fast start, graceful landing */
+      const eased    = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      el.textContent = Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    /* stagger each counter slightly for visual rhythm */
+    const delay = parseInt(el.closest('.stat-item').dataset.delay || 0, 10);
+    setTimeout(() => requestAnimationFrame(tick), delay);
+  });
+}
+
+/* Set stagger delays and fire on load */
+document.addEventListener('DOMContentLoaded', () => {
+  const items = document.querySelectorAll('.stat-item');
+  items.forEach((item, i) => item.dataset.delay = i * 180);
+  setTimeout(runCounters, 320);
+});
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════════
+   STAR PARTICLE CANVAS
+════════════════════════════════════════════ */
+(function initStars() {
+  const canvas = document.getElementById('stars-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function mkStar() {
+    return {
+      x:     rand(0, W),
+      y:     rand(0, H),
+      r:     rand(0.3, 1.6),
+      speed: rand(0.04, 0.18),
+      alpha: rand(0.2, 0.9),
+      dAlpha: rand(0.003, 0.012) * (Math.random() < .5 ? 1 : -1),
+      gold:  Math.random() < 0.25   /* 25 % are gold-tinted */
+    };
+  }
+
+  function init() {
+    resize();
+    stars = Array.from({ length: 130 }, mkStar);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const s of stars) {
+      /* drift upward */
+      s.y -= s.speed;
+      if (s.y < -2) { s.y = H + 2; s.x = rand(0, W); }
+
+      /* twinkle */
+      s.alpha += s.dAlpha;
+      if (s.alpha > 0.92 || s.alpha < 0.12) s.dAlpha *= -1;
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.gold
+        ? `rgba(201,168,76,${s.alpha.toFixed(2)})`
+        : `rgba(240,240,255,${s.alpha.toFixed(2)})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  draw();
+})();
+</script>
+</body>
+</html>
